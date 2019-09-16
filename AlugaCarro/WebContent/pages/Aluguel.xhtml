@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/layout.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml"></ui:include>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<h:form id="formListaAluguel">
+			<p:dataTable id="tabelaAluguel" widgetVar="tblAluguel"
+				emptyMessage="Nenhum Registro Encontrado."
+				value="#{MBAluguel.itens}" var="item"
+				filteredValue="#{MBAluguel.itensFiltrados}" paginator="true"
+				rows="5">
+
+				<f:facet name="header">
+					Lista de Alugueis
+				</f:facet>
+
+				<p:column headerText="Código" sortBy="#{item.codigo}">
+					<h:outputText value="#{item.codigo}" />
+				</p:column>
+
+				<p:column headerText="Quantidade de Carros"
+					sortBy="#{item.qtd_carros}" filterBy="#{item.qtd_carros}"
+					filterMatchMode="contains">
+					<h:outputText value="#{item.qtd_carros}" />
+				</p:column>
+
+				<p:column headerText="Data" sortBy="#{item.date}"
+					filterBy="#{item.date}" filterMatchMode="contains">
+					<h:outputText value="#{item.date}" />
+				</p:column>
+
+				<p:column headerText="Placa do Carro" sortBy="#{item.carro.placa}"
+					filterBy="#{item.carro.placa}" filterMatchMode="contains">
+					<h:outputText value="#{item.carro.placa}" />
+				</p:column>
+
+				<p:column headerText="Cpf do Cliente" sortBy="#{item.cliente.cpf}">
+					<h:outputText value="#{item.cliente.cpf}" />
+				</p:column>
+
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgExcluirAluguel').show();"
+						update=":formAluguelExcluir:painelExluirAluguel">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBAluguel.aluguel}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('dlgAlterarAluguel').show();"
+						update=":formAluguelAlterar:painelAlterarAluguel">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBAluguel.aluguel}" />
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBAluguel.preparaAluguel}"
+						oncomplete="PF('dlgNovoAluguel').show();"
+						update=":formAluguelNovo:painelAluguelNovo" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgNovoAluguel" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Cadastro de  Aluguel">
+
+			<h:form id="formAluguelNovo">
+				<h:panelGrid id="painelAluguelNovo" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBAluguel.aluguel.codigo}" />
+
+					<h:outputLabel value="Quantidade de Carros:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBAluguel.aluguel.qtd_carros}" />
+
+					<h:outputLabel value="Data:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBAluguel.aluguel.date}" />
+									
+
+					<h:outputLabel value="Placa do Carro :" />
+
+					<h:selectOneMenu id="carro_placa" value="#{MBAluguel.aluguel.carro.placa}">
+						<f:selectItem  itemValue="" itemLabel="Selecione a Placa do Carro" />
+						<f:selectItems value="#{MBAluguel.comboCarro}" var="item"
+							itemValue="#{item.placa}" itemLabel="#{item.placa}" />
+
+					</h:selectOneMenu>
+					
+					
+					<h:outputLabel value="CPF do Cliente:" />
+
+					<h:selectOneMenu id="cliente_cpf" value="#{MBAluguel.aluguel.cliente.cpf}">
+						<f:selectItem itemValue="" itemLabel="Selecione o CPF do Cliente" />
+						<f:selectItems value="#{MBAluguel.comboCliente}" var="item"
+							itemValue="#{item.cpf}" itemLabel="#{item.cpf}" />
+
+					</h:selectOneMenu>
+
+
+
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+
+					<p:commandButton value="Gravar"
+						actionListener="#{MBAluguel.novoAluguel}"
+						oncomplete="PF('dlgNovoAluguel').hide(); tblAluguel.clearFilters();"
+						update=":formListaAluguel:tabelaAluguel" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgNovoAluguel').hide();" />
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgExcluirAluguel" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir Aluguel">
+
+			<h:form id="formAluguelExcluir">
+				<p:panelGrid id="painelExluirAluguel" columns="2">
+
+					<h:outputText value="Código" />
+					<h:outputText value="#{MBAluguel.aluguel.codigo}" />
+					
+					<h:outputText value="Data" />
+					<h:outputText value="#{MBAluguel.aluguel.date}" />
+					
+					<h:outputText value="Quantidade de Carros" />
+					<h:outputText value="#{MBAluguel.aluguel.qtd_carros}" />
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoExcluirAluguel" columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBAluguel.excluir}"
+						oncomplete="PF('dlgExcluirAluguel').hide(); tblAluguel.clearFilters();"
+						update=":formListaAluguel:tabelaAluguel" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgExcluirAluguel').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgAlterarAluguel" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Alterar Aluguel">
+
+			<h:form id="formAluguelAlterar">
+				<p:panelGrid id="painelAlterarAluguel" columns="2">
+
+					<h:outputLabel value="Código" />
+					<h:outputText value="#{MBAluguel.aluguel.codigo}" />
+
+					<h:outputLabel value="Data:" />
+					<h:inputText value="#{MBAluguel.aluguel.date}" size="20" maxlength="30" />
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoAlterarAluguel" columns="2">
+					<p:commandButton value="Alterar"
+						actionListener="#{MBAluguel.alterar}"
+						oncomplete="PF('dlgAlterarAluguel').hide(); tblAluguel.clearFilters();"
+						update=":formListaAluguel:tabelaAluguel" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgAlterarAluguel').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+	</ui:define>
+
+
+
+</ui:composition>

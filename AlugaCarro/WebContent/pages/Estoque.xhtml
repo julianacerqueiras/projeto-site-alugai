@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/layout.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml"></ui:include>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<h:form id="formListaEstoque">
+			<p:dataTable id="tabelaEstoque" widgetVar="tblEstoque"
+				emptyMessage="Nenhum Registro Encontrado." value="#{MBEstoque.itens}"
+				var="item" filteredValue="#{MBEstoque.itensFiltrados}" paginator="true"
+				rows="5">
+
+				<f:facet name="header">
+					Lista de Estoques
+				</f:facet>
+
+				<p:column headerText="Nome" sortBy="#{item.nome}">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				<p:column headerText="Quantidade de Carros" sortBy="#{item.qtd_estoque}"
+					filterBy="#{item.qtd_estoque}" filterMatchMode="contains">
+					<h:outputText value="#{item.qtd_estoque}" />
+				</p:column>
+				
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgExcluirEstoque').show();"
+						update=":formEstoqueExcluir:painelExluirEstoque">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBEstoque.estoque}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('dlgAlterarEstoque').show();"
+						update=":formEstoqueAlterar:painelAlterarEstoque">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBEstoque.estoque}" />
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBEstoque.preparaEstoque}"
+						oncomplete="PF('dlgNovoEstoque').show();"
+						update=":formEstoqueNovo:painelEstoqueNovo" />
+				</f:facet>				
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgNovoEstoque" closable="false" draggable="false"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Cadastro de Estoque">
+
+			<h:form id="formEstoqueNovo">
+				<h:panelGrid id="painelEstoqueNovo" columns="2">
+					<h:outputLabel value="Nome:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBEstoque.estoque.nome}" />
+
+					<h:outputLabel value="Quantidade de Carros:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBEstoque.estoque.qtd_estoque}" />							
+
+				</h:panelGrid>
+				
+				
+				<h:panelGrid columns="2">
+
+					<p:commandButton value="Gravar"
+						actionListener="#{MBEstoque.novoEstoque}"
+						oncomplete="PF('dlgNovoEstoque').hide(); tblEstoque.clearFilters();"
+						update=":formListaEstoque:tabelaEstoque" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgNovoEstoque').hide();" />
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgExcluirEstoque" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir Estoque">
+
+			<h:form id="formEstoqueExcluir">
+				<p:panelGrid id="painelExluirEstoque" columns="2">
+
+					<h:outputText value="Nome:" />
+					<h:outputText value="#{MBEstoque.estoque.nome}" />
+					
+					<h:outputText value="Quantidade de Carros:" />
+					<h:outputText value="#{MBEstoque.estoque.qtd_estoque}" />
+					
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoExcluirEstoque" columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBEstoque.excluir}"
+						oncomplete="PF('dlgExcluirEstoque').hide(); tblEstoque.clearFilters();"
+						update=":formListaEstoque:tabelaEstoque" />
+						
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgExcluirEstoque').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgAlterarEstoque" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Alterar Estoque">
+
+			<h:form id="formEstoqueAlterar">
+				<p:panelGrid id="painelAlterarEstoque" columns="2">
+
+					<h:outputLabel value="Nome:" />
+					<h:outputText value="#{MBEstoque.estoque.nome}" />
+
+					<h:outputLabel value="Quantidade de Carros:" />
+					<h:inputText value="#{MBEstoque.estoque.qtd_estoque}" size="20" maxlength="30" />
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoAlterarEstoque" columns="2">
+					<p:commandButton value="Alterar"
+						actionListener="#{MBEstoque.alterar}"
+						oncomplete="PF('dlgAlterarEstoque').hide(); tblEstoque.clearFilters();"
+						update=":formListaEstoque:tabelaEstoque" />
+						
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgAlterarEstoque').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+	</ui:define>
+
+
+
+</ui:composition>

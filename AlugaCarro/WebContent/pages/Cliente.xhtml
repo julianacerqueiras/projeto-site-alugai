@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/layout.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml"></ui:include>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<h:form id="formListaCliente">
+			<p:dataTable id="tabelaCliente" widgetVar="tblCliente"
+				emptyMessage="Nenhum Registro Encontrado."
+				value="#{MBCliente.itens}" var="item"
+				filteredValue="#{MBCliente.itensFiltrados}" paginator="true"
+				rows="5">
+
+				<f:facet name="header">
+					Lista de Clientes
+				</f:facet>
+
+				<p:column headerText="CPF:" sortBy="#{item.cpf}"
+					filterBy="#{item.cpf}" filterMatchMode="contains">
+					<h:outputText value="#{item.cpf}" />
+				</p:column>
+
+				<p:column headerText="Nome:" sortBy="#{item.nome}">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+
+				<p:column headerText="E-mail:" sortBy="#{item.email}"
+					filterBy="#{item.email}" filterMatchMode="contains">
+					<h:outputText value="#{item.email}" />
+				</p:column>
+
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgExcluirCliente').show();"
+						update=":formClienteExcluir:painelExluirCliente">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBCliente.cliente}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('dlgAlterarCliente').show();"
+						update=":formClienteAlterar:painelAlterarCliente">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{MBCliente.cliente}" />
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBCliente.preparaCliente}"
+						oncomplete="PF('dlgNovoCliente').show();"
+						update=":formClienteNovo:painelClienteNovo" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgNovoCliente" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Cadastro de Clientes">
+
+			<h:form id="formClienteNovo">
+				<h:panelGrid id="painelClienteNovo" columns="2">
+					<h:outputLabel value="Nome:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBCliente.cliente.nome}" />
+
+					<h:outputLabel value="CPF:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBCliente.cliente.cpf}" />
+
+					<h:outputLabel value="E-mail:" />
+					<h:inputText size="20" maxlength="30"
+						value="#{MBCliente.cliente.email}" />
+
+				</h:panelGrid>
+
+
+				<h:panelGrid columns="2">
+
+					<p:commandButton value="Gravar"
+						actionListener="#{MBCliente.novoCliente}"
+						oncomplete="PF('dlgNovoCliente').hide(); tblCliente.clearFilters();"
+						update=":formListaCliente:tabelaCliente" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgNovoCliente').hide();" />
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgExcluirCliente" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Excluir Cliente">
+
+			<h:form id="formClienteExcluir">
+				<p:panelGrid id="painelExluirCliente" columns="2">
+
+					<h:outputText value="Nome:" />
+					<h:outputText value="#{MBCliente.cliente.nome}" />
+
+					<h:outputText value="CPF:" />
+					<h:outputText value="#{MBCliente.cliente.cpf}" />
+
+					<h:outputText value="E-mail:" />
+					<h:outputText value="#{MBCliente.cliente.email}" />
+
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoExcluirCliente" columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBCliente.excluir}"
+						oncomplete="PF('dlgExcluirCliente').hide(); tblCliente.clearFilters();"
+						update=":formListaCliente:tabelaCliente" />
+
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgExcluirCliente').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgAlterarCliente" closable="false"
+			draggable="false" resizable="false" modal="true" appendTo="@(body)"
+			header="Alterar Cliente">
+
+			<h:form id="formClienteAlterar">
+				<p:panelGrid id="painelAlterarCliente" columns="2">
+
+					<h:outputLabel value="Nome:" />
+					<h:outputText value="#{MBCliente.cliente.nome}" />
+
+					<h:outputLabel value="CPF:" />
+					<h:outputText value="#{MBCliente.cliente.cpf}" />
+
+					<h:outputLabel value="E-mail:" />
+					<h:inputText value="#{MBCliente.cliente.email}" size="20"
+						maxlength="40" />
+
+				</p:panelGrid>
+
+				<p:panelGrid id="painelBotaoAlterarCliente" columns="2">
+					<p:commandButton value="Alterar"
+						actionListener="#{MBCliente.alterar}"
+						oncomplete="PF('dlgAlterarCliente').hide(); tblCliente.clearFilters();"
+						update=":formListaCliente:tabelaCliente" />
+
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgAlterarCliente').hide();" />
+				</p:panelGrid>
+
+			</h:form>
+
+
+		</p:dialog>
+
+	</ui:define>
+
+
+
+</ui:composition>
